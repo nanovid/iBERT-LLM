@@ -1,0 +1,48 @@
+### Simulations ###
+pe_sim1: 2
+pe_sim2: 2
+systolic_sim1: 2
+systolic_sim2: 2
+systolic_sim3: 2
+systolic_sim4: 2
+addr_sim1[MEM_A]: 2
+addr_sim2[MEM_A]: 2
+addr_sim3[MEM_A]: 2
+addr_sim1[MEM_B]: 2
+addr_sim2[MEM_B]: 2
+addr_sim3[MEM_B]: 2
+addr_sim1[MEM_D]: 2
+addr_sim2[MEM_D]: 2
+addr_sim3[MEM_D]: 2
+addr_sim4[MEM_B_pp]: 2
+addr_sim5[MEM_B_pp]: 2
+addr_sim6[MEM_B_pp]: 2
+addr_sim4[MEM_D_pp]: 2
+addr_sim5[MEM_D_pp]: 2
+addr_sim6[MEM_D_pp]: 2
+pe_impl_sim: 2
+systolic_impl_sim: 5
+addr_impl_sim[MEM_A]: 5
+addr_impl_sim[MEM_B]: 5
+addr_impl_sim[MEM_D]: 5
+addr_impl_sim_pp[MEM_B]: 5
+addr_impl_sim_pp[MEM_D]: 5
+### Utilizations ###
+pe_impl_util: 0
+systolic_impl_util: 0
+mem_write_A_impl_util: 0
+mem_write_B_impl_util: 0
+mem_read_D_impl_util: 0
+mem_write_B_impl_util_pp: 2
+mem_read_D_impl_util_pp: 2
+### Timings ###
+pe_impl_timing: 1
+systolic_impl_timing: 2
+mem_write_A_impl_timing: 2
+mem_write_B_impl_timing: 2
+mem_read_D_impl_timing: 2
+mem_write_B_impl_timing_pp: 2
+mem_read_D_impl_timing_pp: 2
+### Lint ###
+lint_pe: 2
+lint_systolic: 2

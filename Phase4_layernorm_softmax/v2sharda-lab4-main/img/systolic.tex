@@ -1,0 +1,183 @@
+%\documentclass{beamer}
+\documentclass[handout]{beamer}
+
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{circuitikz}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepackage{ifthen}
+\usepackage[absolute,overlay]{textpos}
+\usepackage{todonotes}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{xcolor}
+\usepackage[export]{adjustbox}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{caption}
+\usepackage[noend]{algpseudocode}
+
+\usepackage{minted} % source-code highlighting
+
+\captionsetup{justification=centering}
+
+\usetikzlibrary{matrix,backgrounds,shapes,shapes.callouts,arrows,positioning,calc,snakes,fit}
+\usetikzlibrary{circuits.logic.US}
+\usepgflibrary{decorations.markings}
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
+\newcommand*{\DOT}{.}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png,.eps}
+
+\setbeamertemplate{sidebar right}{}
+\setbeamertemplate{footline}{%
+  \hfill\usebeamertemplate***{navigation symbols}
+\hspace{1cm}\insertframenumber{}/\inserttotalframenumber}
+
+\makeatletter
+\let\slideno\beamer@slideinframe
+\makeatother
+
+
+\begin{document}
+
+\pgfdeclarelayer{bg}    % declare background layer
+\pgfsetlayers{bg,main}  % set the order of the layers (main is the standard layer)
+
+\thispagestyle{empty}
+\begin{frame}
+  %\frametitle{Lab3 $\rightarrow$ Systolic Core}
+  \begin{center}
+  \scalebox{0.9}{
+  \begin{tikzpicture}
+    \pgfmathsetmacro{\Nx}{3}
+    \pgfmathsetmacro{\Ny}{3}
+    \foreach \x in {0,...,\Nx} {
+      \foreach \y in {0,...,\Ny} {
+    	\pgfmathtruncatemacro{\xx}{\Nx-\x}
+    	\pgfmathtruncatemacro{\yy}{\Ny-\y}
+        \node [draw,fill=blue!20,minimum height=0.75cm,minimum
+          width=0.75cm,align=center] (mac\x\y) at
+	  (1.2*\x,1.2*\y) {\tiny pe.sv\\[-1ex]\tiny pe[\yy][\x]};
+      }
+    }
+    \pgfmathtruncatemacro{\Nym}{\Ny-1}
+    \foreach \x in {0,...,\Nx} {
+      \foreach \y in {0,...,\Nym} {
+        \pgfmathtruncatemacro{\yp}{\y+1}
+        \draw [<-] (mac\x\y.north) -- (mac\x\yp.south);
+      }
+    }
+    \pgfmathtruncatemacro{\Nxm}{\Nx-1}
+    \foreach \x in {0,...,\Nxm} {
+      \foreach \y in {0,...,\Ny} {
+	\pgfmathtruncatemacro{\xp}{\x+1}
+        \draw [->] (mac\x\y.east) -- (mac\xp\y.west);
+	\draw [thick,red,->] ([yshift=-0.25cm]mac\x\y.east) -- ([yshift=-0.25cm]mac\xp\y.west);
+      }
+    }
+    \foreach \y in {0,...,\Ny} {
+      \pgfmathtruncatemacro{\yy}{\Ny-\y}
+      \node [fill=red!20,minimum height=0.5cm,minimum
+        width=0.5cm] (ramd\y) at
+	(1.2*\Nx+1.2,1.2*\y) {\tiny D[\yy]};
+      \node [fill=red!20,minimum height=0.5cm,minimum
+        width=0.5cm] (rama\y) at
+	(-1.2,1.2*\y) {\tiny A[\yy]};
+      \draw [thick,red,->] ([yshift=-0.25cm]mac\Nx\y.east) -- ([yshift=-0.25cm]ramd\y.west);
+      \draw [<-] (mac0\y.west) -- (rama\y.east);
+    }
+    \foreach \x in {0,...,\Nx} {
+      \node [fill=red!20,minimum height=0.5cm,minimum
+        width=0.5cm] (ramb\x) at
+	(1.2*\x,1.2*\Ny+1) {\tiny B[\x]};
+      \draw [<-] (mac\x\Ny.north) -- (ramb\x);
+    }
+    \node (s2mm) [draw=none] at ($(rama0.south)+(0,-0.5)$) {\tiny s2mm.sv};
+    \node (mm2s) [draw=none] at ($(ramd0.south)+(0,-0.5)$) {\tiny mm2s.sv};
+    \node [draw,fill=gray!20,minimum height=0.25cm,minimum width=0.5cm,align=center] 
+      (memwra) at ($(s2mm)+(0,-1)$) {\tiny mem\_write\_A.sv};
+    \node [draw,fill=gray!20,minimum height=0.25cm,minimum width=0.5cm,align=center] 
+      (memwrb) at ($(memwra.east)+(1,0)$) {\tiny mem\_write\_B.sv};
+    \node [draw,fill=gray!20,minimum height=0.25cm,minimum width=0.5cm,align=center] 
+      (memrdd) at ($(mm2s)+(0,-1)$) {\tiny mem\_read\_D.sv};
+    \node [minimum height=0.25cm,minimum
+      width=0.5cm,align=center] (ctrlmm_old) at ($(mac00)!0.5!(mac10)+(0,-0.75)$) {};
+    \draw [->] (memwrb) -- (s2mm);
+    \draw [->] (memwra) -- (s2mm);
+    \draw [->] (memrdd) -- (mm2s);
+    \begin{pgfonlayer}{bg}
+        \node (core) [draw=none,fill=gray!75,fit=(memwra) (memwrb) (memrdd) (s2mm)
+            (mm2s) (rama0) (ramd0) (ramb\Nx),rounded corners=0.25cm,inner
+          sep=25pt,label={[xshift=5ex,yshift=2ex]below:\tiny mm\_axi.sv}] {};
+        \node (core) [draw=none,fill=gray!50,fit=(memwra) (memwrb) (memrdd) (s2mm)
+            (mm2s) (rama0) (ramd0) (ramb\Nx),rounded corners=0.25cm,inner
+          xsep=15pt,inner ysep=12pt,label={[xshift=5ex,yshift=2ex]below:\tiny mm.sv}] {};
+    \end{pgfonlayer}
+
+    \begin{pgfonlayer}{bg}
+      \path[rounded corners, draw=gray!75, fill=gray!50,opacity=0.9]
+        ([xshift=-0.05em,yshift=-0.5em]s2mm.south west) to
+        ([xshift=-0.5em,yshift=-0.5em]rama0.south west) to
+        ([xshift=-0.5em,yshift=0.5em]rama3.north west) to
+        ([xshift=-0.5em,yshift=0.5em]ramb0.north west) to
+        ([xshift=0.5em,yshift=0.5em]ramb3.north east) to
+        ([xshift=0.5em,yshift=-0.5em]ramb3.south east) to
+        ([xshift=-0.5em,yshift=-0.5em]ramb0.south west) to
+        ([xshift=0.5em,yshift=0.5em]rama3.north east) to
+        ([xshift=0.5em,yshift=-0.5em]rama0.south east) to
+        ([xshift=0.05em,yshift=-0.5em]s2mm.south east) -- cycle;
+    \end{pgfonlayer}
+
+    \begin{pgfonlayer}{bg}
+      \path[rounded corners, draw=gray!75, fill=gray!50,opacity=0.9]
+        ([xshift=-0.05em,yshift=-0.5em]mm2s.south west) to
+        ([xshift=-0.5em,yshift=-0.5em]ramd0.south west) to
+        ([xshift=-0.5em,yshift=0.5em]ramd3.north west) to
+        ([xshift=0.5em,yshift=0.5em]ramd3.north east) to
+        ([xshift=0.5em,yshift=-0.5em]ramd0.south east) to
+        ([xshift=0.05em,yshift=-0.5em]mm2s.south east) -- cycle;
+    \end{pgfonlayer}
+
+    \begin{pgfonlayer}{bg}
+      \begin{scope}
+        \node (systolic) [draw=black,fill=blue!05,fit=(ctrlmm_old) (mac00)
+            (mac\Nx\Ny),rounded corners=0.25cm,inner xsep=5pt,
+            inner ysep=5pt,label={[xshift=5ex,yshift=2.5ex]below:\tiny systolic.sv}] {};
+      \end{scope}
+    \end{pgfonlayer}
+
+    \draw [thick, <-] (s2mm.west) -- ++(-1,0) node [left,align=center]
+      {\tiny AXI \tiny  Stream};
+    \draw [thick, <-] (core.south west) ++(0,0.5) -- ++(-1,0) node [left,align=center]
+      {\tiny AXI \tiny  Lite};
+    \draw [thick, ->] (mm2s.east) -- ++(1,0) node [right,align=center]
+      {\tiny AXI \tiny  Stream};
+    
+    \draw [blue,thick, <->] ([xshift=-1.2em]rama0.west) --
+    ([xshift=-1.2em]rama3.west) node [midway,left] {N1};
+    \draw [blue,thick, <->] ([yshift=1.2em]ramb0.north) --
+    ([yshift=1.2em]ramb3.north) node [midway,above] {N2};
+    \draw [blue,thick, <->] ([xshift=1.2em]ramd0.east) --
+    ([xshift=1.2em]ramd3.east) node [midway,right] {N1};
+    % \draw [blue, <->] ([yshift=0.4em]rama3.north west) --
+    % ([yshift=0.4em]rama3.north east) node [midway,above] {\tiny MEM DEPTH};
+  \end{tikzpicture}
+  }
+  \end{center}
+\end{frame}
+\end{document}
+

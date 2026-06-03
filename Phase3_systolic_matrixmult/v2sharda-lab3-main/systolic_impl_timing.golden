@@ -1,0 +1,95 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
+| Date         : Sat Mar  8 13:34:13 2025
+| Host         : DEATHSTAR running 64-bit Ubuntu 24.04.2 LTS
+| Command      : report_timing -file systolic_impl_timing.golden
+| Design       : systolic
+| Device       : 7z020-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             1.211ns  (required time - arrival time)
+  Source:                 genblk1[2].genblk1[0].pe_inst/out_b_reg[2]/C
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Destination:            genblk1[3].genblk1[0].pe_inst/out_sum_reg[29]/D
+                            (rising edge-triggered cell FDRE clocked by clk  {rise@0.000ns fall@5.000ns period=10.000ns})
+  Path Group:             clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            10.000ns  (clk rise@10.000ns - clk rise@0.000ns)
+  Data Path Delay:        8.767ns  (logic 4.380ns (49.961%)  route 4.387ns (50.039%))
+  Logic Levels:           13  (CARRY4=8 LUT3=2 LUT4=1 LUT6=2)
+  Clock Path Skew:        -0.049ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.924ns = ( 10.924 - 10.000 ) 
+    Source Clock Delay      (SCD):    0.973ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk rise edge)        0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=3415, unset)         0.973     0.973    genblk1[2].genblk1[0].pe_inst/clk
+    SLICE_X55Y80         FDRE                                         r  genblk1[2].genblk1[0].pe_inst/out_b_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X55Y80         FDRE (Prop_fdre_C_Q)         0.456     1.429 r  genblk1[2].genblk1[0].pe_inst/out_b_reg[2]/Q
+                         net (fo=17, routed)          1.313     2.742    genblk1[2].genblk1[0].pe_inst/out_b_reg[7]_4[2]
+    SLICE_X53Y84         LUT6 (Prop_lut6_I0_O)        0.124     2.866 r  genblk1[2].genblk1[0].pe_inst/out_sum[4]_i_31__11/O
+                         net (fo=2, routed)           0.632     3.498    genblk1[2].genblk1[0].pe_inst/out_sum[4]_i_31__11_n_0
+    SLICE_X53Y82         LUT6 (Prop_lut6_I0_O)        0.124     3.622 r  genblk1[2].genblk1[0].pe_inst/out_sum[4]_i_35__11/O
+                         net (fo=1, routed)           0.000     3.622    genblk1[2].genblk1[0].pe_inst/out_sum[4]_i_35__11_n_0
+    SLICE_X53Y82         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.550     4.172 r  genblk1[2].genblk1[0].pe_inst/out_sum_reg[4]_i_20__11/CO[3]
+                         net (fo=1, routed)           0.000     4.172    genblk1[2].genblk1[0].pe_inst/out_sum_reg[4]_i_20__11_n_0
+    SLICE_X53Y83         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.334     4.506 r  genblk1[2].genblk1[0].pe_inst/out_sum_reg[8]_i_20__11/O[1]
+                         net (fo=2, routed)           0.812     5.318    genblk1[2].genblk1[0].pe_inst_n_37
+    SLICE_X52Y82         LUT3 (Prop_lut3_I2_O)        0.331     5.649 r  out_sum[8]_i_12__11/O
+                         net (fo=2, routed)           0.872     6.521    out_sum[8]_i_12__11_n_0
+    SLICE_X52Y82         LUT4 (Prop_lut4_I0_O)        0.332     6.853 r  out_sum[8]_i_16__11/O
+                         net (fo=1, routed)           0.000     6.853    out_sum[8]_i_16__11_n_0
+    SLICE_X52Y82         CARRY4 (Prop_carry4_S[2]_CO[3])
+                                                      0.398     7.251 r  out_sum_reg[8]_i_10__11/CO[3]
+                         net (fo=1, routed)           0.000     7.251    out_sum_reg[8]_i_10__11_n_0
+    SLICE_X52Y83         CARRY4 (Prop_carry4_CI_O[3])
+                                                      0.313     7.564 r  out_sum_reg[12]_i_10__11/O[3]
+                         net (fo=33, routed)          0.758     8.322    genblk1[3].genblk1[0].pe_inst/out_sum_reg[15]_0[3]
+    SLICE_X48Y84         LUT3 (Prop_lut3_I2_O)        0.306     8.628 r  genblk1[3].genblk1[0].pe_inst/out_sum[16]_i_8__11/O
+                         net (fo=1, routed)           0.000     8.628    genblk1[3].genblk1[0].pe_inst/out_sum[16]_i_8__11_n_0
+    SLICE_X48Y84         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.550     9.178 r  genblk1[3].genblk1[0].pe_inst/out_sum_reg[16]_i_1__11/CO[3]
+                         net (fo=1, routed)           0.000     9.178    genblk1[3].genblk1[0].pe_inst/out_sum_reg[16]_i_1__11_n_0
+    SLICE_X48Y85         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.114     9.292 r  genblk1[3].genblk1[0].pe_inst/out_sum_reg[20]_i_1__11/CO[3]
+                         net (fo=1, routed)           0.000     9.292    genblk1[3].genblk1[0].pe_inst/out_sum_reg[20]_i_1__11_n_0
+    SLICE_X48Y86         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.114     9.406 r  genblk1[3].genblk1[0].pe_inst/out_sum_reg[24]_i_1__11/CO[3]
+                         net (fo=1, routed)           0.000     9.406    genblk1[3].genblk1[0].pe_inst/out_sum_reg[24]_i_1__11_n_0
+    SLICE_X48Y87         CARRY4 (Prop_carry4_CI_O[1])
+                                                      0.334     9.740 r  genblk1[3].genblk1[0].pe_inst/out_sum_reg[28]_i_1__11/O[1]
+                         net (fo=1, routed)           0.000     9.740    genblk1[3].genblk1[0].pe_inst/out_sum_reg[28]_i_1__11_n_6
+    SLICE_X48Y87         FDRE                                         r  genblk1[3].genblk1[0].pe_inst/out_sum_reg[29]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk rise edge)       10.000    10.000 r  
+                                                      0.000    10.000 r  clk (IN)
+                         net (fo=3415, unset)         0.924    10.924    genblk1[3].genblk1[0].pe_inst/clk
+    SLICE_X48Y87         FDRE                                         r  genblk1[3].genblk1[0].pe_inst/out_sum_reg[29]/C
+                         clock pessimism              0.000    10.924    
+                         clock uncertainty           -0.035    10.889    
+    SLICE_X48Y87         FDRE (Setup_fdre_C_D)        0.062    10.951    genblk1[3].genblk1[0].pe_inst/out_sum_reg[29]
+  -------------------------------------------------------------------
+                         required time                         10.951    
+                         arrival time                          -9.740    
+  -------------------------------------------------------------------
+                         slack                                  1.211    
+
+
+
+
