@@ -1,1 +1,64 @@
-0. Project Overview & System ArchitectureThe overarching objective of this lab series is to construct a fully custom hardware accelerator for an IBERT Transformer Layer utilizing integer-only arithmetic to limit hardware footprint while maximizing performance.Hardware-Software Co-Design FrameworkThe Core Compute Engine: Built upon a parameterizable, two-dimensional Systolic Array composed of autonomous processing elements (PEs) executing Matrix Multiplications (mm.sv).Non-Linear Activations & Normalization: Features dedicated multi-cycle division blocks (div.sv), second-order polynomial pipelines for Exponentiation (exp.sv) and Gaussian Error Linear Units (gelu.sv), and vectorized Layer Normalization wrappers (layer_norm.sv).Memory Architecture: To circumvent traditional compute bottlenecks, input and output matrices are partitioned across parallel RAM banks using cyclic (interleaved) partitioning. Advanced dual-buffered (Ping-Pong) address generation allows for simultaneous matrix write/compute execution.Dual-Clock Domain System: To insulate computing capabilities from peripheral communication bounds, the peripheral wrapper logic (AXI-Stream data loader/unloader) interfaces with the ARM Host processor at a lower clock frequency (clk), while the internal computing blocks and memory bank read interfaces operate on a dedicated high-frequency fast clock (fclk). Clock boundaries are isolated seamlessly using dual-clock block RAM primitives.1. LAB 1: Basic Math Operations & Simulation InterfaceAccumulate (ACC), Multiply and Accumulate (MAC), Maximum (MAX), and Array of MACsLab ObjectivesBecome familiar with SystemVerilog syntax, the Xilinx Vivado xsim simulator, and the baseline testbench interfaces by implementing fundamental arithmetic components.Module Specifications1. ACC Module (acc.sv)Computes result = result + in_data on a streaming vector input.Parameters: D_W (Input data width), D_W_ACC (Accumulator width).I/O Ports: clk, rst (synchronous active-high), initialize (restarts accumulation; must discard history without dropping current clock cycle data), in_data, result.Latency: Observed after a fixed latency of 1 clock cycle.2. MAC Module (mac.sv)Computes dot products: result = result + a * b on parallel input streams.Parameters: D_W, D_W_ACC.I/O Ports: clk, rst, a, b, initialize, result.3. MAX Module (max.sv)Computes the running maximum value of a vector: result = max(result, in_data).Parameters: D_W.I/O Ports: clk, rst, initialize, in_data, result.4. Array Module (array.sv)Instantiates a parameterizable parallel lane of N independent MAC units using SystemVerilog generate statements.Parameters: D_W, D_W_ACC, N.I/O Ports: clk, rst, a ($D\_W \times N$), b ($D\_W \times N$), initialize ($N$ bits), result ($D\_W\_ACC \times N$).
+# Unified IBERT Transformer Hardware Accelerator
+A complete hardware-software co-design stack implementing a fully custom, integer-only IBERT Language Model accelerator on an FPGA. This project covers the full RTL-to-Silicon development lifecycle—from basic arithmetic units up to a multi-clock domain pipelined transformer execution block deployed on the PYNQ-Z2 ARM+FPGA SoC platform.
+
+## 🚀 Project Overview & Architecture
+The overarching goal of this project is to construct a hardware accelerator for an IBERT Transformer Layer utilizing integer-only arithmetics to optimize throughput and energy efficiency on FPGA hardware.
+
+Key Architectural Features:
+Systolic Core: A parameterizable 2D grid of independent Processing Elements (PEs) executing nearest-neighbor matrix multiplication.
+
+Interleaved Memory Architecture: Input/output matrices are cyclic-partitioned across parallel RAM banks to ensure collision-free streaming access.
+
+Dual-Buffered Memory: Advanced Ping-Pong address generators slice large matrices into blocks, enabling simultaneous execution and memory loading for continuous processing.
+
+Dual-Clock Isolation: Lower-speed interface wrappers feed data from the CPU at a slower clock (clk), while the internal computing blocks and memory interfaces run on a high-frequency fast clock (fclk).
+
+## 🛠️ Technical Progression & Accomplishments
+### Phase 1: Streaming Arithmetic Foundations
+Goal: Establish foundational streaming datapaths with single-cycle latency constraints.
+
+Designed an Accumulate (ACC) module to sum streaming vectors and a Multiply-Accumulate (MAC) module for dot products.
+
+Created a Maximum (MAX) tracker and scaled the MAC units into a parameterizable parallel array using SystemVerilog generate blocks.
+
+Handled precise synchronous resets and initialization signals to flush accumulators without dropping active clock-cycle data.
+
+### Phase 2: Multi-Cycle & Pipelined Activations
+Goal: Implement complex mathematical operations using Finite State Machines (FSMs) and high-throughput pipelines.
+
+Division (DIV): Built a multi-cycle state machine implementing a shifting division algorithm, utilizing a Leading One Position Detector (LOPD) to extract base-2 logarithms.
+
+Exponent (EXP): Engineered a fully pipelined, single-cycle integer approximation of exponentiation using a second-order polynomial. Handled dynamic range scaling by widening internal precision to twice the data width.
+
+GELU: Created a matching single-cycle pipeline for the Gaussian Error Linear Unit activation, evaluating signs, bounds clamping, and absolute value scaling via native bit-level inspection.
+
+### Phase 3: 2D Systolic Array & Memory Management
+Goal: Scale the compute units into a massively parallel grid and resolve the memory bandwidth wall.
+
+Processing Elements (PEs): Designed non-blocking MAC blocks that pass registered operands to adjacent neighbors while shifting computed sums horizontally.
+
+Systolic Grid: Wired a parametric 2D Nearest-Neighbor grid to execute matrix multiplications.
+
+Cyclic Partitioning: Wrote address generators (mem_write_A/B, mem_read_D) that map streaming row-serial or column-serial matrices into discrete memory banks for simultaneous multi-word fetches.
+
+Ping-Pong Buffering: Implemented double-buffered address states to slice matrices into sub-blocks, allowing dynamic physical memory overwriting without stalling the compute array.
+
+### Phase 4: End-to-End IBERT Integration
+Goal: Stitch the components into a complete Transformer layer and deploy to physical silicon.
+
+Attention Head: Multiplexed the Systolic Array to compute Query (Q), Key (K), and Value (V) projections. Handled requantization scaling, the transpose-multiplication, and integrated the Softmax pipeline.
+
+MM + LayerNorm / GELU: Fused dense matrix multiplications with residual tracking (skip connections), matrix addition cores, and bias-adding requantization networks.
+
+Deployment: Wrapped the system in standard AXI-Stream interfaces (tdata, tvalid, tready, tlast), synthesized the netlist via Xilinx Vivado, mapped it to the PYNQ-Z2 FPGA, and verified the hardware using an ARM Python driver.
+
+## 💻 Tech Stack
+Hardware Description: SystemVerilog
+
+Simulation & Verification: Verilator (C++), Xilinx xsim, GTKWave
+
+Synthesis & Implementation: Xilinx Vivado
+
+Target Hardware: PYNQ-Z2 (Zynq-7000 ARM/FPGA SoC)
+
+Host Interfacing: Python, AXI-Stream Memory Mapped protocols
